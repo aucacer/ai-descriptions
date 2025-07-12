@@ -379,9 +379,9 @@ export default function AIDescriptionGenerator() {
       if (section.isTile) {
         const bgColor = palette.backgrounds[tileIdx % palette.backgrounds.length] || palette.backgrounds[0]
         tileIdx++
-        const tileStyle = `background:${bgColor};margin:24px 0;padding:20px 16px;border-radius:8px;border:1px solid #e0e0e0;`
-        const titleStyle = `color:${palette.title};font-size:18px;margin-bottom:12px;font-weight:bold;`
-        const contentStyle = `line-height:1.6;color:${palette.text};margin-bottom:10px;`
+        const tileStyle = `background:${bgColor};margin:15px 0;padding:15px 12px;border-radius:8px;border:1px solid #e0e0e0;box-sizing:border-box;width:100%;`
+        const titleStyle = `color:${palette.title};font-size:clamp(16px, 3.5vw, 18px);margin-bottom:10px;font-weight:bold;word-wrap:break-word;`
+        const contentStyle = `line-height:1.6;color:${palette.text};margin-bottom:8px;word-wrap:break-word;`
         const listStyle = 'padding-left:20px;margin:0;'
         const liStyle = `margin:8px 0;color:${palette.text};font-size:16px;`
         
@@ -406,12 +406,12 @@ export default function AIDescriptionGenerator() {
         if (section.isList && section.items.length > 0) {
           return `<div style="${tileStyle}">
 <h3 style="${titleStyle}">${cleanTitle}</h3>
-${section.items.map(item => `<p style="margin:5px 0;color:${palette.text};font-size:16px;">• ${item}</p>`).join('\n')}
+${section.items.map(item => `<p style="margin:5px 0;color:${palette.text};font-size:clamp(14px, 3vw, 16px);word-wrap:break-word;">• ${item}</p>`).join('\n')}
 </div>`
         } else if (section.items.length > 0) {
           return `<div style="${tileStyle}">
 <h3 style="${titleStyle}">${cleanTitle}</h3>
-${section.items.map(item => `<p style="margin:0;color:${palette.text};font-size:16px;">${item}</p>`).join('\n')}
+${section.items.map(item => `<p style="margin:0;color:${palette.text};font-size:clamp(14px, 3vw, 16px);word-wrap:break-word;">${item}</p>`).join('\n')}
 </div>`
         } else if (cleanTitle.trim()) {
           // Section with title but no content - probably a standalone header
@@ -421,21 +421,21 @@ ${section.items.map(item => `<p style="margin:0;color:${palette.text};font-size:
         }
         return ''
       } else if (section.isList && section.items.length > 0) {
-        return section.items.map(item => `<p style='margin:5px 0;color:${palette.text};font-size:16px;'>• ${item}</p>`).join('')
+        return section.items.map(item => `<p style='margin:5px 0;color:${palette.text};font-size:clamp(14px, 3vw, 16px);word-wrap:break-word;'>• ${item}</p>`).join('')
       } else if (section.items.length && section.items[0].startsWith('#')) {
         // Just show the hashtags, no heading
-        return `<div style="color:${palette.title};font-weight:bold;margin-top:24px;font-size:16px;text-align:center;">${section.items.join(' ')}</div>`
+        return `<div style="color:${palette.title};font-weight:bold;margin-top:20px;font-size:clamp(14px, 3vw, 16px);text-align:center;word-wrap:break-word;">${section.items.join(' ')}</div>`
       } else if (section.items.length > 0) {
-        const descStyle = `line-height:1.6;color:${palette.text};margin:15px 0;`
+        const descStyle = `line-height:1.6;color:${palette.text};margin:12px 0;font-size:clamp(14px, 3vw, 16px);word-wrap:break-word;`
         return section.items.map(item => `<p style='${descStyle}'>${item}</p>`).join('')
       }
       return ''
     }).filter(html => html.trim()).join('\n\n')
 
-    // Only show the big bold title at the top (remove the white box tile)
-    const fullHTML = `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px;">
+    // Only show the big bold title at the top (remove the white box tile) - Mobile optimized
+    const fullHTML = `<div style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:15px;box-sizing:border-box;width:100%;">
 
-<div style="font-size:2.2em;font-weight:bold;color:#222;margin-bottom:0.5em;line-height:1.1;">${topTitle}</div>
+<div style="font-size:clamp(1.5em, 4vw, 2.2em);font-weight:bold;color:#222;margin-bottom:0.5em;line-height:1.1;word-wrap:break-word;">${topTitle}</div>
 
 ${htmlContent}
 
