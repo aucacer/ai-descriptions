@@ -515,6 +515,11 @@ ${htmlContent}
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <nav className="hidden md:flex items-center gap-4 mr-4">
+                <a href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
+                <a href="/tips" className="text-gray-600 hover:text-gray-900 transition-colors">Tips</a>
+                <a href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">Contact</a>
+              </nav>
               <AISettings onSettingsChange={setAiSettings} />
               <Button variant="outline" onClick={reset} className="flex items-center gap-2 bg-transparent">
                 <RotateCcw className="h-4 w-4" />
@@ -676,6 +681,42 @@ ${htmlContent}
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-8 mt-16">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">AI Description Generator</h3>
+              <p className="text-gray-300">
+                Create professional eBay listings with AI-powered descriptions and SEO optimization.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-md font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2">
+                <li><a href="/about" className="text-gray-300 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="/tips" className="text-gray-300 hover:text-white transition-colors">eBay Tips</a></li>
+                <li><a href="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                <li><a href="/privacy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/terms" className="text-gray-300 hover:text-white transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-md font-semibold mb-4">Features</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li>AI-Powered Research</li>
+                <li>SEO Optimization</li>
+                <li>HTML Formatting</li>
+                <li>Mobile Responsive</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center">
+            <p className="text-gray-300">© {new Date().getFullYear()} AI Description Generator. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
 
       {/* HTML Output Modal */}
       <Dialog open={showHtmlModal} onOpenChange={setShowHtmlModal}>
