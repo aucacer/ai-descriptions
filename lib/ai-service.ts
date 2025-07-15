@@ -60,8 +60,11 @@ export class OpenAIProvider implements AIProvider {
   name = 'OpenAI';
   private apiKey: string;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey || (process.env.OPENAI_API_KEY as string);
+    if (!this.apiKey) {
+      throw new Error('OpenAI API key is missing. Please set OPENAI_API_KEY as an environment variable.');
+    }
   }
 
   async generateDescription(request: DescriptionRequest): Promise<string> {
