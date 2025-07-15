@@ -268,7 +268,7 @@ export class AIService {
 // Product Research Service
 export class ProductResearchService {
   private static instance: ProductResearchService;
-  private openAIApiKey: string = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+  private openAIApiKey: string = process.env.OPENAI_API_KEY || '';
   private productImages: string[] = [];
 
   static getInstance(): ProductResearchService {
@@ -281,8 +281,8 @@ export class ProductResearchService {
   // Initialize API key automatically
   private initializeApiKey() {
     if (!this.openAIApiKey) {
-      // Try to get from environment variables
-      this.openAIApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+      // Try to get from environment variables (SERVER-SIDE ONLY)
+      this.openAIApiKey = process.env.OPENAI_API_KEY || '';
     }
   }
 
@@ -1634,7 +1634,7 @@ export const productResearchService = ProductResearchService.getInstance();
 
 // Auto-initialize OpenAI provider
 const initializeServices = () => {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (apiKey) {
     const openAIProvider = new OpenAIProvider(apiKey);
     aiService.registerProvider('openai', openAIProvider);

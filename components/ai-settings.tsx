@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Settings, Key, Sparkles } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
-import { aiService, DescriptionRequest } from "@/lib/ai-service"
+import { DescriptionRequest } from "@/lib/ai-service"
 
 interface AISettingsProps {
   onSettingsChange: (settings: {

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2, Copy, RotateCcw, Sparkles, CheckCircle } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { AISettings } from "@/components/ai-settings"
-import { aiService, DescriptionRequest, productResearchService } from "@/lib/ai-service"
+import { DescriptionRequest } from "@/lib/ai-service"
 
 export default function AIDescriptionGenerator() {
   const [productTitle, setProductTitle] = useState("")
@@ -54,21 +54,35 @@ export default function AIDescriptionGenerator() {
 
       let researchData;
       try {
-        researchData = await productResearchService.researchProduct(productTitle.trim())
-        const confidence = researchData?.confidence || 0;
-        const confidenceText = confidence > 0.8 ? 'High accuracy' : 
-                              confidence > 0.6 ? 'Good accuracy' : 
-                              confidence > 0.4 ? 'Moderate accuracy' : 'Basic research';
-        
-        toast({
-          title: "Research Complete",
-          description: `Product data gathered with ${confidenceText} (${Math.round(confidence * 100)}% confidence)`,
-        })
+        const researchResponse = await fetch('/api/research-product', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            productTitle: productTitle.trim()
+          })
+        });
+
+        if (researchResponse.ok) {
+          researchData = await researchResponse.json();
+          const confidence = researchData?.confidence || 0;
+          const confidenceText = confidence > 0.8 ? 'High accuracy' : 
+                                confidence > 0.6 ? 'Good accuracy' : 
+                                confidence > 0.4 ? 'Moderate accuracy' : 'Basic research';
+          
+          toast({
+            title: "Research Complete",
+            description: `Product data gathered with ${confidenceText} (${Math.round(confidence * 100)}% confidence)`,
+          })
+        } else {
+          throw new Error('Research API failed');
+        }
       } catch (researchError) {
         console.warn("Research failed, using basic generation:", researchError)
         toast({
           title: "Research Limited",
-          description: "Using basic generation - consider adding OpenAI API key for full research",
+          description: "Using basic generation - API key may need configuration",
           variant: "default",
         })
       }
@@ -76,7 +90,7 @@ export default function AIDescriptionGenerator() {
       setIsResearching(false)
 
       // Step 2: Generate description with research data
-      const request: DescriptionRequest = {
+      const request = {
         productTitle: productTitle.trim(),
         style: aiSettings.style,
         tone: aiSettings.tone,
@@ -86,7 +100,19 @@ export default function AIDescriptionGenerator() {
         researchData: researchData,
       }
 
-      const response = await aiService.generateDescription(request, aiSettings.provider)
+      const descriptionResponse = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request)
+      });
+
+      if (!descriptionResponse.ok) {
+        throw new Error('Description generation failed');
+      }
+
+      const response = await descriptionResponse.json();
       setGeneratedDescription(response.description)
       setStep("editing")
 
@@ -159,10 +185,25 @@ export default function AIDescriptionGenerator() {
         description: "Creating product-specific color palette",
       })
 
-      const colorPalette = await productResearchService.generateColorPalette(
-        [], // We'll get images from the stored research data if available
-        productTitle.trim()
-      )
+      const colorResponse = await fetch('/api/generate-colors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productTitle: productTitle.trim(),
+          productImages: [] // We'll get images from the stored research data if available
+        })
+      });
+
+      const colorPalette = colorResponse.ok ? await colorResponse.json() : {
+        primaryColor: '#0066CC',
+        secondaryColor: '#4A90E2',
+        accentColor: '#7B68EE',
+        backgroundColor: '#FFFFFF',
+        textColor: '#333333',
+        lightBackgrounds: ['#FFFFFF', '#F8F9FA', '#E9ECEF']
+      }
       setProductColorPalette(colorPalette)
 
       // Get palette for HTML conversion
