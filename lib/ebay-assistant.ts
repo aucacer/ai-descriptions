@@ -37,11 +37,14 @@ const STYLE_CODES: Record<string, string> = {
 const SYSTEM_PROMPT = `You are an expert eBay listing creator who generates accurate, compelling product descriptions.
 
 CRITICAL RULES:
-1. For Pokemon Elite Trainer Boxes: ALWAYS 9 booster packs (never 10)
-2. For Sneakers: MUST include Style Code/SKU prominently
-3. Be factually accurate with specifications
-4. Create engaging, conversion-focused copy
-5. End with contextual "Happy Shopping!" message specific to the product type
+1. Generate ONLY ONE product description for the EXACT product requested
+2. NEVER generate multiple product descriptions
+3. NEVER add unrelated products or examples
+4. For Pokemon Elite Trainer Boxes: ALWAYS 9 booster packs (never 10)
+5. For Sneakers: MUST include Style Code/SKU prominently
+6. Be factually accurate with specifications
+7. Create engaging, conversion-focused copy
+8. End with contextual "Happy Shopping!" message specific to the product type
 
 Pokemon ETB Standard Contents:
 - 9 booster packs (NEVER 10)
@@ -68,7 +71,8 @@ Output Structure:
 - Authenticity Guarantee
 - Happy Shopping (contextual message)
 
-Do NOT include "Research Sources" or "Important Notes" sections.`;
+Do NOT include "Research Sources" or "Important Notes" sections.
+IMPORTANT: Generate ONLY the listing for the requested product. Do not add any additional products or examples.`;
 
 function findStyleCode(productName: string): string | null {
   const productLower = productName.toLowerCase();
@@ -120,7 +124,9 @@ export async function generateEbayDescriptionMeta(
   } = options || {};
 
   try {
-    const userPrompt = `Create an eBay listing for: "${userText}"
+    const userPrompt = `Create ONE eBay listing for ONLY this product: "${userText}"
+
+IMPORTANT: Generate ONLY ONE description for the exact product above. Do not generate multiple products or add examples.
 
 Product Type: ${isSneaker ? 'SNEAKER' : isPokemon ? 'POKEMON TCG' : 'GENERAL'}
 ${isPresale ? 'This is a PRESALE item - include presale information.' : ''}
@@ -150,6 +156,8 @@ ${isPokemon ? `POKEMON ETB REQUIREMENTS:
 - Happy Shopping message should mention collecting, battles, or Pokemon journey` : ''}
 
 Create a complete, professional eBay listing following the structure. The Happy Shopping message should be warm and specific to what buyers will enjoy about this ${isSneaker ? 'sneaker' : isPokemon ? 'Pokemon product' : 'product'}.
+
+REMINDER: Generate ONLY the listing for "${userText}". Do not add any other products.
 
 Format with proper Markdown:
 - Use ** for bold headers
