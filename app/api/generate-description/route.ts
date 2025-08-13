@@ -1,41 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { OpenAIProvider, DescriptionRequest } from '@/lib/ai-service';
+import { generateEbayDescription, generateEbayDescriptionMeta } from '@/lib/ebay-assistant';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { productTitle, style, tone, includeFeatures, includeShipping, includeGuarantee, researchData } = body;
+    const { userText, productTitle, debug, includeFeatures, includeShipping, includeGuarantee, style, tone } = body || {};
+    const searchParams = new URL(request.url).searchParams;
+    const debugEnabled = debug === true || searchParams.get('debug') === '1';
 
-    // Validate required fields
-    if (!productTitle) {
-      return NextResponse.json({ error: 'Product title is required' }, { status: 400 });
+    const input = (userText || productTitle || '').toString().trim();
+    if (!input) {
+      return NextResponse.json({ error: 'Provide `userText` or `productTitle`' }, { status: 400 });
     }
 
-    // Create description request
-    const descriptionRequest: DescriptionRequest = {
-      productTitle,
-      style: style || 'professional',
-      tone: tone || 'friendly',
-      includeFeatures: includeFeatures !== false,
-      includeShipping: includeShipping !== false,
-      includeGuarantee: includeGuarantee !== false,
-      researchData
+    const options = {
+      includeFeatures,
+      includeShipping,
+      includeGuarantee,
+      style,
+      tone
     };
 
-    // Initialize OpenAI provider with server-side API key
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+    if (debugEnabled) {
+      const { text, meta } = await generateEbayDescriptionMeta(input, options);
+      return NextResponse.json({
+        description: text,
+        provider: 'OpenAI Assistant',
+        timestamp: new Date().toISOString(),
+        meta,
+      });
+    } else {
+      const description = await generateEbayDescription(input, options);
+      return NextResponse.json({
+        description,
+        provider: 'OpenAI Assistant',
+        timestamp: new Date().toISOString()
+      });
     }
-
-    const openAIProvider = new OpenAIProvider(apiKey);
-    const description = await openAIProvider.generateDescription(descriptionRequest);
-
-    return NextResponse.json({ 
-      description,
-      provider: 'OpenAI',
-      timestamp: new Date().toISOString()
-    });
 
   } catch (error) {
     console.error('Description generation error:', error);

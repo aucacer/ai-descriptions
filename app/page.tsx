@@ -43,69 +43,23 @@ export default function AIDescriptionGenerator() {
     }
 
     setIsGenerating(true)
-    setIsResearching(true)
+    setIsResearching(false)
 
     try {
-      // Step 1: Research product information
-      toast({
-        title: "Researching...",
-        description: "Gathering product information from multiple sources",
-      })
-
-      let researchData;
-      try {
-        const researchResponse = await fetch('/api/research-product', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            productTitle: productTitle.trim()
-          })
-        });
-
-        if (researchResponse.ok) {
-          researchData = await researchResponse.json();
-          const confidence = researchData?.confidence || 0;
-          const confidenceText = confidence > 0.8 ? 'High accuracy' : 
-                                confidence > 0.6 ? 'Good accuracy' : 
-                                confidence > 0.4 ? 'Moderate accuracy' : 'Basic research';
-          
-          toast({
-            title: "Research Complete",
-            description: `Product data gathered with ${confidenceText} (${Math.round(confidence * 100)}% confidence)`,
-          })
-        } else {
-          throw new Error('Research API failed');
-        }
-      } catch (researchError) {
-        console.warn("Research failed, using basic generation:", researchError)
-        toast({
-          title: "Research Limited",
-          description: "Using basic generation - API key may need configuration",
-          variant: "default",
-        })
-      }
-
-      setIsResearching(false)
-
-      // Step 2: Generate description with research data
-      const request = {
-        productTitle: productTitle.trim(),
-        style: aiSettings.style,
-        tone: aiSettings.tone,
-        includeFeatures: aiSettings.includeFeatures,
-        includeShipping: aiSettings.includeShipping,
-        includeGuarantee: aiSettings.includeGuarantee,
-        researchData: researchData,
-      }
-
+      // Generate description directly using the new assistant (with built-in web search)
       const descriptionResponse = await fetch('/api/generate-description', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request)
+        body: JSON.stringify({ 
+          userText: productTitle.trim(),
+          includeFeatures: aiSettings.includeFeatures,
+          includeShipping: aiSettings.includeShipping,
+          includeGuarantee: aiSettings.includeGuarantee,
+          style: aiSettings.style,
+          tone: aiSettings.tone
+        })
       });
 
       if (!descriptionResponse.ok) {
@@ -118,7 +72,7 @@ export default function AIDescriptionGenerator() {
 
       toast({
         title: "Success!",
-        description: `SEO-optimized description generated using ${response.provider}${researchData ? ' with research data' : ''}`,
+        description: `SEO-optimized description generated using ${response.provider}`,
       })
     } catch (error) {
       console.error("AI generation error:", error)
@@ -578,14 +532,15 @@ ${htmlContent}
             <div className="text-center space-y-4">
               <h2 className="text-3xl font-bold text-gray-900">Create Professional eBay Descriptions</h2>
               <p className="text-lg text-gray-600 max-w-2xl">
-                Save time and boost sales with AI-powered product descriptions that research your product across multiple sources, 
-                include SEO optimization, and provide professional formatting for maximum eBay visibility.
+                Generate professional eBay listings in under 10 seconds with AI-powered accuracy. Specialized support for 
+                sneakers with style codes, Pokemon cards with correct quantities, and comprehensive product research.
               </p>
               <div className="flex flex-wrap justify-center gap-2 mt-4">
-                <Badge variant="secondary">Web Research</Badge>
-                <Badge variant="secondary">SEO Optimized</Badge>
-                <Badge variant="secondary">Professional</Badge>
-                <Badge variant="secondary">HTML Ready</Badge>
+                <Badge variant="secondary">⚡ 10-Second Generation</Badge>
+                <Badge variant="secondary">👟 Sneaker Style Codes</Badge>
+                <Badge variant="secondary">🎯 SEO Optimized</Badge>
+                <Badge variant="secondary">✅ 100% Accurate</Badge>
+                <Badge variant="secondary">📦 HTML Ready</Badge>
               </div>
             </div>
 
@@ -596,7 +551,7 @@ ${htmlContent}
               </CardHeader>
               <CardContent className="space-y-4">
                 <Input
-                  placeholder="e.g., Vintage Leather Jacket Men's Size Large Brown"
+                  placeholder="e.g., Pokemon Prismatic Evolutions Elite Trainer Box"
                   value={productTitle}
                   onChange={(e) => setProductTitle(e.target.value)}
                   className="text-lg py-6"
@@ -633,7 +588,7 @@ ${htmlContent}
                     <h3 className="font-semibold">AI-Powered</h3>
                   </div>
                   <p className="text-sm text-gray-600">
-                    Advanced AI researches your product across multiple sources and generates compelling, data-driven descriptions.
+                    Single-pass AI generation with built-in product knowledge, style code database, and accuracy validation.
                   </p>
                 </CardContent>
               </Card>

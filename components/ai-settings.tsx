@@ -164,7 +164,14 @@ export function AISettings({ onSettingsChange }: AISettingsProps) {
                   checked={includeFeatures}
                   onCheckedChange={(checked) => {
                     setIncludeFeatures(checked)
-                    handleSettingsChange()
+                    onSettingsChange({
+                      provider: selectedProvider,
+                      style,
+                      tone,
+                      includeFeatures: checked,
+                      includeShipping,
+                      includeGuarantee,
+                    })
                   }}
                 />
               </div>
@@ -178,7 +185,14 @@ export function AISettings({ onSettingsChange }: AISettingsProps) {
                   checked={includeShipping}
                   onCheckedChange={(checked) => {
                     setIncludeShipping(checked)
-                    handleSettingsChange()
+                    onSettingsChange({
+                      provider: selectedProvider,
+                      style,
+                      tone,
+                      includeFeatures,
+                      includeShipping: checked,
+                      includeGuarantee,
+                    })
                   }}
                 />
               </div>
@@ -192,7 +206,14 @@ export function AISettings({ onSettingsChange }: AISettingsProps) {
                   checked={includeGuarantee}
                   onCheckedChange={(checked) => {
                     setIncludeGuarantee(checked)
-                    handleSettingsChange()
+                    onSettingsChange({
+                      provider: selectedProvider,
+                      style,
+                      tone,
+                      includeFeatures,
+                      includeShipping,
+                      includeGuarantee: checked,
+                    })
                   }}
                 />
               </div>
